@@ -1,6 +1,5 @@
 package android.icloudtech.com.spotifystreamer;
 
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -59,7 +58,7 @@ public class MainActivityFragment extends Fragment {
         listView.setAdapter(arrayAdapter);
 
        FetchSpotifyTask spotifyTask= new FetchSpotifyTask();
-       spotifyTask.execute("bob");
+       spotifyTask.execute("coldplay");
 
         return rootview;
 
@@ -71,21 +70,9 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected String[] doInBackground(String... params) {
             try {
-                String jsonStr = null;
-                String type = "artist";
-
-                final String SPOTIFY_BASE_URL = "https://api.spotify.com/v1/search?";
-                final String QUERY_PARAM = "q";
-                final String TYPE_PARAM = "type";
-
-                Uri builtUri = Uri.parse(SPOTIFY_BASE_URL).buildUpon()
-                        .appendQueryParameter(QUERY_PARAM, params[0])
-                        .appendQueryParameter(TYPE_PARAM, type)
-                        .build();
-
-                URL url = new URL(builtUri.toString());
-                jsonStr = getData(url);
-                String artists[] = getArtistDataFromJson(jsonStr);
+                String url = "https://api.spotify.com/v1/search?q="+params[0]+"&type=artist";
+                String jsonStr = getData(url);
+                String artists[] = getArtistArray(jsonStr);
                 return artists;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -104,7 +91,7 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
-    private String[] getArtistDataFromJson(String jsonStr)
+    private String[] getArtistArray(String jsonStr)
             throws JSONException {
 
         String[] arr = null;
@@ -112,25 +99,32 @@ public class MainActivityFragment extends Fragment {
         JSONObject completeObj = new JSONObject(jsonStr);
         JSONObject artists = completeObj.getJSONObject("artists");
         JSONArray items = artists.getJSONArray("items");
+        JSONArray images = null;
+        String imageURL = null;
 
         if (items != null) {
             arr = new String[items.length()];
             for (int i = 0; i < items.length(); i++) {
                 JSONObject item = items.getJSONObject(i);
                 String artistName = item.getString("name");
-                arr[i] = artistName;
+
+                /*images = item.getJSONArray("images");
+                imageURL = images.getJSONObject(0).getString("url");*/
+                arr[i] = artistName; // + " " + imageURL;
             }
         }
         return arr;
     }
 
-    public String getData(URL url) {
+    public String getData(String strUrl) {
         String jsonStr = null;
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
+        URL url = null;
 
         try {
             // Create the request to Spotify, and open the connection
+            url = new URL(strUrl);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
