@@ -1,7 +1,10 @@
 package android.icloudtech.com.spotifystreamer;
 
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,27 +12,27 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class MainActivityFragment extends Fragment {
     ArrayAdapter<String> arrayAdapter = null;
     SearchView search;
 
-
-    //This arraylist will have data as pulled from server.
-    //ArrayList<Product> productResults = new ArrayList<Product>();
-
-    // In order to filter the product results based on the search strings
-    //ArrayList<Product> filterProductResults = new ArrayList<Product>() ;
-
     public MainActivityFragment() {
     }
+
     @Override
     public void onCreate (Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -45,10 +48,10 @@ public class MainActivityFragment extends Fragment {
         search.setQueryHint("Start typing to search...");
 
         List <String> playList = new ArrayList<String>();
-        playList.add("Coldplay magic");
+        /*playList.add("Coldplay magic");
         playList.add("Coldplay china town");
         playList.add("Coldplay paradise");
-        playList.add("Coldplay scientist");
+        playList.add("Coldplay scientist");*/
 
         arrayAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_main, R.id.list_textview,playList);
         View rootview = inflater.inflate(R.layout.fragment_main, container, false);
@@ -56,25 +59,114 @@ public class MainActivityFragment extends Fragment {
         listView.setAdapter(arrayAdapter);
 
        FetchSpotifyTask spotifyTask= new FetchSpotifyTask();
-       spotifyTask.execute(" ");
+       spotifyTask.execute("bob");
 
         return rootview;
 
     }
 
+    public class FetchSpotifyTask extends AsyncTask<String, Void, String[]> {
+        private final String LOG_TAG = FetchSpotifyTask.class.getSimpleName();
 
+        @Override
+        protected String[] doInBackground(String... params) {
+            try {
+                String jsonStr = null;
+                String type = "artist";
 
+                final String SPOTIFY_BASE_URL = "https://api.spotify.com/v1/search?";
+                final String QUERY_PARAM = "q";
+                final String TYPE_PARAM = "type";
+
+                Uri builtUri = Uri.parse(SPOTIFY_BASE_URL).buildUpon()
+                        .appendQueryParameter(QUERY_PARAM, params[0])
+                        .appendQueryParameter(TYPE_PARAM, type)
+                        .build();
+
+                URL url = new URL(builtUri.toString());
+                jsonStr = getData(url);
+                String artists[] = getArtistDataFromJson(jsonStr);
+                return artists;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) {
+            if (result != null) {
+                arrayAdapter.clear();
+                for (String dayForecastStr : result) {
+                    arrayAdapter.add(dayForecastStr);
+                }
+            }
+        }
     }
 
-public class FetchSpotifyTask extends AsyncTask<String, void, String[]>{
-    private final String LOG_TAG = FetchSpotifyTask.class.getSimpleName();
+    private String[] getArtistDataFromJson(String jsonStr)
+            throws JSONException {
 
-    @Override
-    protected String[] doInBackground(String...params){
+        String[] arr = null;
+
+        JSONObject completeObj = new JSONObject(jsonStr);
+        JSONObject artists = completeObj.getJSONObject("artists");
+        JSONArray items = artists.getJSONArray("items");
+
+        if (items != null) {
+            arr = new String[items.length()];
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                String artistName = item.getString("name");
+                arr[i] = artistName;
+            }
+        }
+        return arr;
+    }
+
+    public String getData(URL url) {
+        String jsonStr = null;
         HttpURLConnection urlConnection = null;
-        //BufferedReader = null;
+        BufferedReader reader = null;
 
+        try {
+            // Create the request to Spotify, and open the connection
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
 
+            // Read the input stream into a String
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuffer buffer = new StringBuffer();
+            if (inputStream == null) {
+                jsonStr = null;
+            }
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line + "\n");
+            }
+
+            if (buffer.length() == 0) {
+                jsonStr = null;
+            }
+            jsonStr = buffer.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            jsonStr = null;
+        } finally{
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    Log.e("PlaceholderFragment", "Error closing stream", e);
+                }
+            }
+        }
+        return jsonStr;
     }
-
 }
