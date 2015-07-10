@@ -48,6 +48,10 @@ public class ArtistAdapter extends BaseAdapter {
         artistList.add(artist);
     }
 
+    public void clear() {
+        artistList.clear();
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 

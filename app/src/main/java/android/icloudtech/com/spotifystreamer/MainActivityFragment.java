@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
@@ -68,7 +67,7 @@ public class MainActivityFragment extends Fragment {
             try {
                 String url = "https://api.spotify.com/v1/search?q="+params[0]+"&type=artist";
                 String jsonStr = getData(url);
-                return getArtist(jsonStr);
+                return getArtistList(jsonStr);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -78,15 +77,16 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(List<Artist> artistList) {
             if (artistList != null) {
-                artistList.clear();
+                artistAdapter.clear();
                 for (Artist artist : artistList) {
                     artistAdapter.add(artist);
+                    break;
                 }
             }
         }
     }
 
-    private List<Artist> getArtist(String jsonStr)
+    private List<Artist> getArtistList(String jsonStr)
             throws JSONException {
 
         List<Artist> artistList = new ArrayList<Artist>();
@@ -105,7 +105,14 @@ public class MainActivityFragment extends Fragment {
                 String artistName = item.getString("name");
 
                 images = item.getJSONArray("images");
-                imageURL = images.getJSONObject(0).getString("url");
+                if (images != null && images.length() > 0) {
+                    JSONObject imageObj = images.getJSONObject(0);
+                    if (imageObj != null) {
+                        imageURL = imageObj.getString("url");
+                    }
+                } else {
+                    continue;
+                }
 
                 Artist artist = new Artist(R.drawable.images, artistName, imageURL);
                 artistList.add(artist);
