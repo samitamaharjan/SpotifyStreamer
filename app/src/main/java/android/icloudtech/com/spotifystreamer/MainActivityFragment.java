@@ -80,7 +80,6 @@ public class MainActivityFragment extends Fragment {
                 artistAdapter.clear();
                 for (Artist artist : artistList) {
                     artistAdapter.add(artist);
-                    break;
                 }
             }
         }
