@@ -26,7 +26,7 @@ import java.util.List;
 
 
 public class MainActivityFragment extends Fragment {
-    ArrayAdapter<String> arrayAdapter = null;
+    ArtistAdapter artistAdapter = null;
     SearchView search;
 
     public MainActivityFragment() {
@@ -46,34 +46,29 @@ public class MainActivityFragment extends Fragment {
         SearchView  search = (SearchView) searchview.findViewById(R.id.search_view);
         search.setQueryHint("Start typing to search...");
 
-        List <String> playList = new ArrayList<String>();
-        /*playList.add("Coldplay magic");
-        playList.add("Coldplay china town");
-        playList.add("Coldplay paradise");
-        playList.add("Coldplay scientist");*/
+        List<Artist> artistList = new ArrayList<Artist>();
+        artistAdapter = new ArtistAdapter(getActivity(), artistList);
 
-        arrayAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_main, R.id.list_textview,playList);
         View rootview = inflater.inflate(R.layout.fragment_main, container, false);
         ListView listView = (ListView) rootview.findViewById(R.id.list_view);
-        listView.setAdapter(arrayAdapter);
+        listView.setAdapter(artistAdapter);
 
-       FetchSpotifyTask spotifyTask= new FetchSpotifyTask();
-       spotifyTask.execute("coldplay");
+        FetchSpotifyTask spotifyTask= new FetchSpotifyTask();
+        spotifyTask.execute("coldplay");
 
         return rootview;
 
     }
 
-    public class FetchSpotifyTask extends AsyncTask<String, Void, String[]> {
+    public class FetchSpotifyTask extends AsyncTask<String, Void, List<Artist>> {
         private final String LOG_TAG = FetchSpotifyTask.class.getSimpleName();
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected List<Artist> doInBackground(String... params) {
             try {
                 String url = "https://api.spotify.com/v1/search?q="+params[0]+"&type=artist";
                 String jsonStr = getData(url);
-                String artists[] = getArtistArray(jsonStr);
-                return artists;
+                return getArtist(jsonStr);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -81,21 +76,22 @@ public class MainActivityFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String[] result) {
-            if (result != null) {
-                arrayAdapter.clear();
-                for (String dayForecastStr : result) {
-                    arrayAdapter.add(dayForecastStr);
+        protected void onPostExecute(List<Artist> artistList) {
+            if (artistList != null) {
+                artistList.clear();
+                for (Artist artist : artistList) {
+                    artistAdapter.add(artist);
                 }
             }
         }
     }
 
-    private String[] getArtistArray(String jsonStr)
+    private List<Artist> getArtist(String jsonStr)
             throws JSONException {
 
-        String[] arr = null;
+        List<Artist> artistList = new ArrayList<Artist>();
 
+        String[] arr = null;
         JSONObject completeObj = new JSONObject(jsonStr);
         JSONObject artists = completeObj.getJSONObject("artists");
         JSONArray items = artists.getJSONArray("items");
@@ -108,12 +104,14 @@ public class MainActivityFragment extends Fragment {
                 JSONObject item = items.getJSONObject(i);
                 String artistName = item.getString("name");
 
-                /*images = item.getJSONArray("images");
-                imageURL = images.getJSONObject(0).getString("url");*/
-                arr[i] = artistName; // + " " + imageURL;
+                images = item.getJSONArray("images");
+                imageURL = images.getJSONObject(0).getString("url");
+
+                Artist artist = new Artist(R.drawable.images, artistName, imageURL);
+                artistList.add(artist);
             }
         }
-        return arr;
+        return artistList;
     }
 
     public String getData(String strUrl) {
