@@ -77,8 +77,7 @@ public class ArtistAdapter extends BaseAdapter {
 
         // set Artist values to ViewHolder
         viewHolder.txtArtistName.setText(artist.getName());
-        viewHolder.imgArtistImg.setImageURI(artist.getImageUri());
-
+        artist.loadImage(this, viewHolder);
         return convertView;
     }
 }
