@@ -1,5 +1,6 @@
 package android.icloudtech.com.spotifystreamer;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 
@@ -45,15 +47,26 @@ public class MainActivityFragment extends Fragment {
         SearchView  search = (SearchView) searchview.findViewById(R.id.search_view);
         search.setQueryHint("Start typing to search...");
 
-        List<Artist> artistList = new ArrayList<Artist>();
+        final List<Artist> artistList = new ArrayList<Artist>();
         artistAdapter = new ArtistAdapter(getActivity(), artistList);
 
         View rootview = inflater.inflate(R.layout.fragment_main, container, false);
         ListView listView = (ListView) rootview.findViewById(R.id.list_view);
         listView.setAdapter(artistAdapter);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Artist selectedArtist = (Artist)artistAdapter.getItem(position);
+                //Toast.makeText(getActivity(), selectedArtist.getName(), Toast.LENGTH_SHORT).show();
+
+                Intent detailIntent = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, "");
+                startActivity(detailIntent);
+            }
+        });
+
         FetchSpotifyTask spotifyTask= new FetchSpotifyTask();
-        spotifyTask.execute("coldplay");
+        spotifyTask.execute("john");
 
         return rootview;
 
