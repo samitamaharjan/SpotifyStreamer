@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements SearchView.OnQueryTextListener {
     ArtistAdapter artistAdapter = null;
     SearchView search;
 
@@ -45,24 +45,34 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        View searchview = inflater.inflate(R.layout.fragment_main, container,false);
-        SearchView  search = (SearchView) searchview.findViewById(R.id.search_view);
-        search.setQueryHint("Start typing to search...");
 
         final List<Artist> artistList = new ArrayList<Artist>();
         artistAdapter = new ArtistAdapter(getActivity(), artistList);
 
         View rootview = inflater.inflate(R.layout.fragment_main, container, false);
         ListView listView = (ListView) rootview.findViewById(R.id.list_view);
+
+        SearchView  searchView = (SearchView) rootview.findViewById(R.id.search_view);
+        searchView.setQueryHint("Start typing to search...");
+
         listView.setAdapter(artistAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Artist selectedArtist = (Artist)artistAdapter.getItem(position);
+                Artist selectedArtist = (Artist) artistAdapter.getItem(position);
                 //Toast.makeText(getActivity(), selectedArtist.getName(), Toast.LENGTH_SHORT).show();
 
                 Intent detailIntent = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, selectedArtist.getName());
