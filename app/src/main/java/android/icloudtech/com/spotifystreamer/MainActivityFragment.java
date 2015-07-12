@@ -40,6 +40,11 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -64,6 +69,10 @@ public class MainActivityFragment extends Fragment {
                 startActivity(detailIntent);
             }
         });
+
+        /*SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = prefs.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));*/
 
         FetchSpotifyTask spotifyTask= new FetchSpotifyTask();
         spotifyTask.execute("john");
