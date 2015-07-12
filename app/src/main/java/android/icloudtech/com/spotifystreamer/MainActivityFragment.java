@@ -60,7 +60,7 @@ public class MainActivityFragment extends Fragment {
                 Artist selectedArtist = (Artist)artistAdapter.getItem(position);
                 //Toast.makeText(getActivity(), selectedArtist.getName(), Toast.LENGTH_SHORT).show();
 
-                Intent detailIntent = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, "");
+                Intent detailIntent = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, selectedArtist.getName());
                 startActivity(detailIntent);
             }
         });

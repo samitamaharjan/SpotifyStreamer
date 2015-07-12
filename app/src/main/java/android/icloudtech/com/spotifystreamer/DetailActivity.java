@@ -16,6 +16,7 @@
 
 package android.icloudtech.com.spotifystreamer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -24,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class DetailActivity extends ActionBarActivity {
 
@@ -71,8 +73,10 @@ public class DetailActivity extends ActionBarActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-
+            Intent intent = getActivity().getIntent();
+            String artistName = intent.getStringExtra(Intent.EXTRA_TEXT);
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+            ((TextView)(rootView.findViewById(R.id.fragment_detail))).setText(artistName);
             return rootView;
         }
     }
