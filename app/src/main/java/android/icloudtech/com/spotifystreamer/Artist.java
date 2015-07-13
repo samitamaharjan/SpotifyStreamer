@@ -13,13 +13,15 @@ import java.net.URL;
 public class Artist {
 
     private int id;
+    private String artistId;
     private String name;
     private URL imageUri;
 
     private ArtistAdapter artistAdapter;
     private Bitmap bitmap;
 
-    public Artist(int id, String name, String strImageUri) {
+    public Artist(int id, String artistId, String name, String strImageUri) {
+        this.artistId = artistId;
         this.name = name;
         setImageUri(strImageUri);
     }
@@ -30,6 +32,14 @@ public class Artist {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(String artistId) {
+        this.artistId = artistId;
     }
 
     public String getName() {

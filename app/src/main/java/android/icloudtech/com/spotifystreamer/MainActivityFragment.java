@@ -81,7 +81,7 @@ public class MainActivityFragment extends Fragment {
                 Artist selectedArtist = (Artist) artistAdapter.getItem(position);
                 //Toast.makeText(getActivity(), selectedArtist.getName(), Toast.LENGTH_SHORT).show();
 
-                Intent detailIntent = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, selectedArtist.getName());
+                Intent detailIntent = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, selectedArtist.getArtistId());
                 startActivity(detailIntent);
             }
         });
@@ -151,8 +151,9 @@ public class MainActivityFragment extends Fragment {
                 } else {
                     continue;
                 }
+                String artistId = item.getString("id");
 
-                Artist artist = new Artist(R.drawable.images, artistName, imageURL);
+                Artist artist = new Artist(R.drawable.images, artistId, artistName, imageURL);
                 artistList.add(artist);
             }
         }

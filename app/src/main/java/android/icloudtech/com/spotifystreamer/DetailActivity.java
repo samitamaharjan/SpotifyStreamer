@@ -75,9 +75,9 @@ public class DetailActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             Intent intent = getActivity().getIntent();
-            String artistName = intent.getStringExtra(Intent.EXTRA_TEXT);
+            String artistId = intent.getStringExtra(Intent.EXTRA_TEXT);
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-            ((TextView)(rootView.findViewById(R.id.fragment_detail))).setText(artistName);
+            ((TextView)(rootView.findViewById(R.id.fragment_detail))).setText(artistId);
             return rootView;
         }
     }
