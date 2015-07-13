@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivityFragment extends Fragment implements SearchView.OnQueryTextListener {
+public class MainActivityFragment extends Fragment {
     ArtistAdapter artistAdapter = null;
     SearchView search;
 
@@ -45,16 +45,6 @@ public class MainActivityFragment extends Fragment implements SearchView.OnQuery
     }
 
     @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        return false;
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -66,6 +56,22 @@ public class MainActivityFragment extends Fragment implements SearchView.OnQuery
 
         SearchView  searchView = (SearchView) rootview.findViewById(R.id.search_view);
         searchView.setQueryHint("Start typing to search...");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                FetchSpotifyTask spotifyTask= new FetchSpotifyTask();
+                spotifyTask.execute(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                FetchSpotifyTask spotifyTask= new FetchSpotifyTask();
+                spotifyTask.execute(newText);
+                return true;
+            }
+        });
 
         listView.setAdapter(artistAdapter);
 
@@ -84,8 +90,8 @@ public class MainActivityFragment extends Fragment implements SearchView.OnQuery
         String location = prefs.getString(getString(R.string.pref_location_key),
                 getString(R.string.pref_location_default));*/
 
-        FetchSpotifyTask spotifyTask= new FetchSpotifyTask();
-        spotifyTask.execute("john");
+        /*FetchSpotifyTask spotifyTask= new FetchSpotifyTask();
+        spotifyTask.execute("john");*/
 
         return rootview;
 
@@ -113,6 +119,7 @@ public class MainActivityFragment extends Fragment implements SearchView.OnQuery
                 for (Artist artist : artistList) {
                     artistAdapter.add(artist);
                 }
+                artistAdapter.notifyDataSetChanged();
             }
         }
     }
@@ -157,6 +164,7 @@ public class MainActivityFragment extends Fragment implements SearchView.OnQuery
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         URL url = null;
+        InputStream inputStream = null;
 
         try {
             // Create the request to Spotify, and open the connection
@@ -166,7 +174,7 @@ public class MainActivityFragment extends Fragment implements SearchView.OnQuery
             urlConnection.connect();
 
             // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
+            inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
                 jsonStr = null;
@@ -188,6 +196,13 @@ public class MainActivityFragment extends Fragment implements SearchView.OnQuery
         } finally{
             if (urlConnection != null) {
                 urlConnection.disconnect();
+            }
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             if (reader != null) {
                 try {
