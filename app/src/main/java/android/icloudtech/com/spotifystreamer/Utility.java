@@ -27,31 +27,27 @@ public class Utility {
 
         String[] arr = null;
         JSONObject completeObj = new JSONObject(jsonStr);
-        JSONObject artists = completeObj.getJSONObject("artists");
-        JSONArray items = artists.getJSONArray("items");
-        JSONArray images = null;
+        JSONArray trackArray = completeObj.getJSONArray("tracks");
+
+        String trackId = null;
         String imageURL = null;
+        String albumName = null;
+        String trackName = null;
+        for (int i = 0; i < trackArray.length(); i++) {
+            JSONObject trackJSON = trackArray.getJSONObject(i);
 
-        if (items != null) {
-            arr = new String[items.length()];
-            for (int i = 0; i < items.length(); i++) {
-                JSONObject item = items.getJSONObject(i);
-                String trackName = item.getString("name");
+            trackId = trackJSON.getString("id");
 
-                images = item.getJSONArray("images");
-                if (images != null && images.length() > 0) {
-                    JSONObject imageObj = images.getJSONObject(0);
-                    if (imageObj != null) {
-                        imageURL = imageObj.getString("url");
-                    }
-                } else {
-                    continue;
-                }
-                String trackId = item.getString("id");
+            JSONObject albumJSON = trackJSON.getJSONObject("album");
+            JSONArray albumImagesJSON = albumJSON.getJSONArray("images");
+            imageURL = albumImagesJSON.getJSONObject(0).getString("url");
 
-                Track track = new Track(R.drawable.images, trackId, trackName, imageURL);
-                trackList.add(track);
-            }
+            albumName = albumJSON.getString("name");
+
+            trackName = trackJSON.getString("name");
+
+            Track track = new Track(R.drawable.images, trackId, trackName, imageURL);
+            trackList.add(track);
         }
         return trackList;
     }
