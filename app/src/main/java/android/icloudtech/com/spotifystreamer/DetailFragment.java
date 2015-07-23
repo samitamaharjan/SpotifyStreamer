@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.List;
 
@@ -26,11 +25,11 @@ public class DetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         Intent intent = getActivity().getIntent();
         String artistId = intent.getStringExtra(Intent.EXTRA_TEXT);
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-        ((TextView)(rootView.findViewById(R.id.fragment_detail))).setText(artistId);
+        //((TextView)(rootView.findViewById(R.id.fragment_detail))).setText(artistId);
 
         FetchTopTracksTask task = new FetchTopTracksTask();
         task.execute(artistId);
+        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         return rootView;
     }
 

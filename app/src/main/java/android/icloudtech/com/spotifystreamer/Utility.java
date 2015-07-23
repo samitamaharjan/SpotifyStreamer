@@ -100,6 +100,7 @@ public class Utility {
             url = new URL(strUrl);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
+            urlConnection.setRequestProperty("Connection","close");
             urlConnection.connect();
 
             // Read the input stream into a String

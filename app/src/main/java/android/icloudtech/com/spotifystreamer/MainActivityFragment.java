@@ -25,12 +25,38 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onCreate (Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        System.out.println("***** ON CREATE *****");
         setHasOptionsMenu(true);
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        System.out.println("***** ON START *****");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        System.out.println("***** ON PAUSE *****");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        System.out.println("***** ON RESUME *****");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        System.out.println("***** ON STOP *****");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        System.out.println("***** ON DESTROY *****");
     }
 
     @Override
